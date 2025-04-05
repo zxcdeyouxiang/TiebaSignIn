@@ -1,0 +1,70 @@
+name: 百度贴吧自动签到
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # 每天 UTC 2:00 运行 (北京时间 10:00)
+  workflow_dispatch:     # 支持手动触发
+    inputs:
+      batch_size:
+        description: '每批签到的贴吧数量'
+        required: false
+        default: '20'
+      batch_interval:
+        description: '批次间隔时间(毫秒)'
+        required: false
+        default: '1000'
+      enable_notify:
+        description: '是否启用通知推送'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  signin:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v3
+        
+      - name: 设置 Node.js 环境
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          
+      - name: 安装依赖
+        run: npm ci
+        
+      - name: 运行签到脚本
+        env:
+          # 基础配置
+          BDUSS: ${{ secrets.BDUSS }}
+          BATCH_SIZE: ${{ github.event.inputs.batch_size || '20' }}
+          BATCH_INTERVAL: ${{ github.event.inputs.batch_interval || '1000' }}
+          
+          # 通知配置
+          ENABLE_NOTIFY: ${{ github.event.inputs.enable_notify || 'false' }}
+          
+          # Server酱通知
+          SERVERCHAN_KEY: ${{ secrets.SERVERCHAN_KEY }}
+          
+          # Bark通知
+          BARK_KEY: ${{ secrets.BARK_KEY }}
+          
+          # Telegram通知
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+          
+          # 钉钉通知
+          DINGTALK_WEBHOOK: ${{ secrets.DINGTALK_WEBHOOK }}
+          DINGTALK_SECRET: ${{ secrets.DINGTALK_SECRET }}
+          
+          # 企业微信通知
+          WECOM_KEY: ${{ secrets.WECOM_KEY }}
+          
+          # PushPlus通知
+          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
+        run: npm start
+        
+      - name: 捕获运行结果
+        if: always()
+        run: echo "签到完成，请查看日志获取详细信息" 

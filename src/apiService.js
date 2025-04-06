@@ -86,6 +86,7 @@ async function login(bduss) {
     const userId = response.data.data.user_id;
     
     const userInfo = {
+      status: 200,
       bduss: bduss,
       userId: userId,
       isValid: true,

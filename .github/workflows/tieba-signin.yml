@@ -2,7 +2,7 @@ name: 百度贴吧自动签到
 
 on:
   schedule:
-    - cron: '0 2 * * *'  # 每天 UTC 2:00 运行 (北京时间 10:00)
+    - cron: '0 2,3,4 * * *'  # 每天 UTC 2:00 3:00 4:00 运行 (北京时间 10:00 11:00 12:00)
   workflow_dispatch:     # 支持手动触发
     inputs:
       batch_size:
@@ -13,6 +13,14 @@ on:
         description: '批次间隔时间(毫秒)'
         required: false
         default: '1000'
+      max_retries:
+        description: '签到失败最大重试次数'
+        required: false
+        default: '3'
+      retry_interval:
+        description: '重试间隔时间(毫秒)'
+        required: false
+        default: '5000'
       enable_notify:
         description: '是否启用通知推送'
         required: false
@@ -22,8 +30,11 @@ on:
 jobs:
   signin:
     runs-on: ubuntu-latest
+    timeout-minutes: 15   # 设置超时限制
+
     env:
       TZ: Asia/Shanghai  # 设置时区为中国标准时间
+
     steps:
       - name: 检出代码
         uses: actions/checkout@v3
@@ -40,33 +51,27 @@ jobs:
         env:
           # 基础配置
           BDUSS: ${{ secrets.BDUSS }}
-          BATCH_SIZE: ${{ github.event.inputs.batch_size || '20' }}
-          BATCH_INTERVAL: ${{ github.event.inputs.batch_interval || '1000' }}
+          BATCH_SIZE: ${{ secrets.BATCH_SIZE || github.event.inputs.batch_size || '20' }}
+          BATCH_INTERVAL: ${{ secrets.BATCH_INTERVAL || github.event.inputs.batch_interval || '1000' }}
           
-          # 通知配置
-          ENABLE_NOTIFY: ${{ github.event.inputs.enable_notify || 'false' }}
+          # 重试配置
+          MAX_RETRIES: ${{ secrets.MAX_RETRIES || github.event.inputs.max_retries || '3' }}
+          RETRY_INTERVAL: ${{ secrets.RETRY_INTERVAL || github.event.inputs.retry_interval || '5000' }}
           
-          # Server酱通知
+          # 通知相关环境变量
+          ENABLE_NOTIFY: ${{ secrets.ENABLE_NOTIFY || github.event.inputs.enable_notify || 'false' }}
           SERVERCHAN_KEY: ${{ secrets.SERVERCHAN_KEY }}
-          
-          # Bark通知
           BARK_KEY: ${{ secrets.BARK_KEY }}
-          
-          # Telegram通知
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
-          
-          # 钉钉通知
           DINGTALK_WEBHOOK: ${{ secrets.DINGTALK_WEBHOOK }}
           DINGTALK_SECRET: ${{ secrets.DINGTALK_SECRET }}
-          
-          # 企业微信通知
           WECOM_KEY: ${{ secrets.WECOM_KEY }}
-          
-          # PushPlus通知
           PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
         run: npm start
-        
-      - name: 捕获运行结果
+      
+      - name: 处理结果
         if: always()
-        run: echo "签到完成，请查看日志获取详细信息" 
+        run: |
+          echo "当前时间: $(date "+%Y/%m/%d %H:%M:%S")"
+          echo "工作流执行状态: ${{ job.status }}" 

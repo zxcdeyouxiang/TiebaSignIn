@@ -1,8 +1,8 @@
 <div align="center">
 
-# 🏆 百度贴吧自动签到
+# 百度贴吧自动签到
 
-[![GitHub Actions](https://github.com/chiupam/tieba/actions/workflows/tieba-signin.yml/badge.svg)](https://github.com/chiupam/tieba/actions)
+[![百度贴吧](https://img.shields.io/badge/百度贴吧-passing-success.svg?style=flat-square&logo=baidu&logoWidth=20&logoColor=white)](https://github.com/chiupam/tieba/actions)
 [![JavaScript](https://img.shields.io/badge/JavaScript-ES6-yellow.svg?style=flat-square&logo=javascript)](https://www.javascript.com/)
 [![Node.js](https://img.shields.io/badge/Node.js-16.x-green.svg?style=flat-square&logo=node.js)](https://nodejs.org/)
 [![GitHub stars](https://img.shields.io/github/stars/chiupam/tieba?style=flat-square&logo=github)](https://github.com/chiupam/tieba/stargazers)
@@ -20,6 +20,7 @@
 - 📊 详细统计：签到后生成详细的统计报告，包含签到排名和连签天数
 - 🚀 部署简单：一次配置，持续运行，无需服务器
 - ⚡ 批量处理：支持批量签到，提高效率并避免请求限制
+- 🔁 智能重试：对签到失败的贴吧自动进行多次重试，提高签到成功率
 
 ## 📝 使用方法
 
@@ -83,6 +84,8 @@
 | `BDUSS` | ✅ | 百度贴吧登录凭证，用于身份验证 | 无 |
 | `BATCH_SIZE` | ❌ | 每批签到的贴吧数量 | 20 |
 | `BATCH_INTERVAL` | ❌ | 批次之间的等待时间(毫秒) | 1000 |
+| `MAX_RETRIES` | ❌ | 签到失败时的最大重试次数 | 3 |
+| `RETRY_INTERVAL` | ❌ | 重试之间的等待时间(毫秒) | 5000 |
 | `ENABLE_NOTIFY` | ❌ | 是否启用通知推送功能 | false |
 
 #### 📲 通知配置
@@ -118,6 +121,52 @@
 - ❌ 签到失败的贴吧及原因
 - 🏅 成功签到贴吧的排名和连签天数
 
+## 🧪 本地测试
+
+您可以在本地环境中测试签到功能，无需依赖GitHub Actions。
+
+### 本地测试准备工作
+
+1. 克隆此仓库到本地：
+   ```bash
+   git clone https://github.com/chiupam/tieba.git
+   cd tieba
+   ```
+
+2. 安装依赖：
+   ```bash
+   npm install
+   ```
+
+3. 创建`.env`文件，用于配置本地测试环境变量：
+   ```bash
+   cp .env.example .env
+   ```
+
+4. 编辑`.env`文件，填入您的`BDUSS`和其他配置
+
+### 测试命令
+
+运行本地测试：
+```bash
+npm test
+```
+
+> 💡 **提示**：
+> - 要测试BDUSS失效的情况，可以在`.env`文件中填写错误的BDUSS值
+> - 本地测试默认使用更小的批次大小和间隔时间
+
+### 通知行为
+
+本项目的通知逻辑为：
+
+1. 只有当以下情况时才会发送通知：
+   - **贴吧签到失败**且**开启了通知功能**时
+   - **BDUSS失效**且**开启了通知功能**时
+2. 当所有贴吧签到成功时，即使开启了通知功能也不会发送通知
+
+> 💡 **提示**：本地测试时BDUSS的有效性会直接影响到结果，如需测试不同场景，可以修改`.env`文件中的BDUSS值
+
 ## ❓ 常见问题
 
 ### 🔧 签到失败怎么办？
@@ -126,6 +175,7 @@
 - 📋 查看 Actions 运行日志，确认具体错误原因
 - 🔄 如果 BDUSS 过期，请重新获取并更新 Secret
 - ⏱️ 签到过快导致失败时，可以尝试增大批次间隔时间
+- 🔁 对于偶发的网络问题，脚本会自动进行重试（最多3次），可通过配置`MAX_RETRIES`和`RETRY_INTERVAL`调整重试次数和间隔
 
 ### 🆕 如何获取新BDUSS？
 

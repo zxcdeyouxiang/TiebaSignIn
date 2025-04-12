@@ -179,6 +179,28 @@ npm test
 
 启用后，您的Fork仓库将会自动与原仓库保持同步，无需手动操作。
 
+## 📁 项目结构
+
+```
+tieba/
+├── .github/                        # GitHub相关配置
+│   └── workflows/                  # GitHub Actions工作流
+│       ├── tieba-signin.yml        # 贴吧签到主工作流
+│       ├── sync-upstream.yml       # 同步上游仓库工作流
+│       └── keep-alive.yml          # 保持仓库活跃工作流
+├── src/                            # 源代码目录
+│   ├── apiService.js               # API服务模块，处理与百度服务器的通信
+│   ├── dataProcessor.js            # 数据处理模块，负责处理和生成统计数据
+│   ├── index.js                    # 主程序入口，协调各模块工作并实现签到逻辑
+│   ├── local-test.js               # 本地测试脚本
+│   ├── notify.js                   # 通知模块，处理各种推送服务的消息发送
+│   └── utils.js                    # 工具函数模块，提供通用功能
+├── .env.example                    # 环境变量示例文件
+├── .gitignore                      # Git忽略文件配置
+├── LICENSE                         # 开源协议
+├── package.json                    # 项目配置和依赖管理
+```
+
 ## ❓ 常见问题
 
 ### 🔧 签到失败怎么办？

@@ -4,6 +4,7 @@
 
 [![百度贴吧](https://img.shields.io/badge/百度贴吧-passing-success.svg?style=flat-square&logo=baidu&logoWidth=20&logoColor=white)](https://github.com/chiupam/tieba/actions)
 [![JavaScript](https://img.shields.io/badge/JavaScript-ES6-yellow.svg?style=flat-square&logo=javascript)](https://www.javascript.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-16.x-green.svg?style=flat-square&logo=node.js)](https://nodejs.org/)
 [![GitHub stars](https://img.shields.io/github/stars/chiupam/tieba?style=flat-square&logo=github)](https://github.com/chiupam/tieba/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/chiupam/tieba?style=flat-square&logo=github)](https://github.com/chiupam/tieba/network/members)
@@ -21,6 +22,7 @@
 - 🚀 部署简单：一次配置，持续运行，无需服务器
 - ⚡ 批量处理：支持批量签到，提高效率并避免请求限制
 - 🔁 智能重试：对签到失败的贴吧自动进行多次重试，提高签到成功率
+- 🧰 TypeScript：使用TypeScript开发，提供更好的类型安全和代码可维护性
 
 ## 📝 使用方法
 
@@ -151,9 +153,19 @@
 npm test
 ```
 
+这个命令会先编译TypeScript代码，然后执行local-test.js文件。
+
 > 💡 **提示**：
 > - 要测试BDUSS失效的情况，可以在`.env`文件中填写错误的BDUSS值
 > - 本地测试默认使用更小的批次大小和间隔时间
+
+### 开发环境运行
+
+如果你想在开发过程中直接使用ts-node运行TypeScript文件，可以使用：
+
+```bash
+npm run dev
+```
 
 ### 通知行为
 
@@ -183,22 +195,41 @@ npm test
 
 ```
 tieba/
-├── .github/                        # GitHub相关配置
-│   └── workflows/                  # GitHub Actions工作流
-│       ├── tieba-signin.yml        # 贴吧签到主工作流
-│       ├── sync-upstream.yml       # 同步上游仓库工作流
-│       └── keep-alive.yml          # 保持仓库活跃工作流
-├── src/                            # 源代码目录
-│   ├── apiService.js               # API服务模块，处理与百度服务器的通信
-│   ├── dataProcessor.js            # 数据处理模块，负责处理和生成统计数据
-│   ├── index.js                    # 主程序入口，协调各模块工作并实现签到逻辑
-│   ├── local-test.js               # 本地测试脚本
-│   ├── notify.js                   # 通知模块，处理各种推送服务的消息发送
-│   └── utils.js                    # 工具函数模块，提供通用功能
-├── .env.example                    # 环境变量示例文件
-├── .gitignore                      # Git忽略文件配置
-├── LICENSE                         # 开源协议
-├── package.json                    # 项目配置和依赖管理
+├── .github/                          # GitHub相关配置
+│   └── workflows/                    # GitHub Actions工作流
+│       ├── build.yml                 # TypeScript构建工作流
+│       ├── keep-alive.yml            # 保持仓库活跃工作流
+│       ├── sync-upstream.yml         # 同步上游仓库工作流
+│       └── tieba-signin.yml          # 贴吧签到主工作流
+├── src/                              # 源代码目录
+│   ├── apiService.ts                 # API服务模块，处理与百度服务器的通信
+│   ├── dataProcessor.ts              # 数据处理模块，负责处理和生成统计数据
+│   ├── index.ts                      # 主程序入口，协调各模块工作并实现签到逻辑
+│   ├── local-test.ts                 # 本地测试脚本
+│   ├── notify.ts                     # 通知模块，处理各种推送服务的消息发送
+│   ├── utils.ts                      # 工具函数模块，提供通用功能
+│   └── types/                        # TypeScript类型定义
+│       ├── index.ts                  # 类型定义入口
+│       ├── apiService.types.ts       # API服务相关类型
+│       ├── dataProcessor.types.ts    # 数据处理相关类型
+│       ├── notify.types.ts           # 通知相关类型
+│       └── utils.types.ts            # 工具函数相关类型
+├── dist/                             # 编译后的JavaScript代码（由build.yml自动构建并提交）
+│   ├── types/                        # 编译后的类型定义
+│   ├── apiService.js                 # 编译后的API服务模块
+│   ├── dataProcessor.js              # 编译后的数据处理模块
+│   ├── index.js                      # 编译后的主脚本文件
+│   ├── local-test.js                 # 编译后的本地测试脚本
+│   ├── notify.js                     # 编译后的通知模块
+│   └── utils.js                      # 编译后的工具函数模块
+├── js-backup/                        # JavaScript原始文件备份
+├── .env.example                      # 环境变量示例文件
+├── tsconfig.json                     # TypeScript配置文件
+├── .gitignore                        # Git忽略文件配置
+├── LICENSE                           # 开源协议
+├── package.json                      # 项目配置和依赖管理
+├── README.md                         # 项目说明文档
+└── tsconfig.json                     # TypeScript配置文件
 ```
 
 ## ❓ 常见问题

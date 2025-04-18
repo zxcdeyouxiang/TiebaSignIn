@@ -2,7 +2,7 @@ name: 百度贴吧自动签到
 
 on:
   schedule:
-    - cron: '0 2,3,4 * * *'  # 每天 UTC 2:00 3:00 4:00 运行 (北京时间 10:00 11:00 12:00)
+    - cron: '0 2,3 * * *'  # 每天 UTC 2:00 3:00 运行 (北京时间 10:00 11:00)
   workflow_dispatch:     # 支持手动触发
 
 jobs:
@@ -46,7 +46,7 @@ jobs:
           DINGTALK_SECRET: ${{ secrets.DINGTALK_SECRET }}
           WECOM_KEY: ${{ secrets.WECOM_KEY }}
           PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
-        run: npm start
+        run: node dist/index.js
       
       - name: 处理结果
         if: always()
